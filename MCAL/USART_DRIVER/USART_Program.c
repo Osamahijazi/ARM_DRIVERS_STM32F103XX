@@ -14,6 +14,7 @@
 
 void USART1_VoidInit(void) {                               /*INIT THE USART CONFIGURATION*/
 
+	
 /**************************************************************************************************************************************************************************************************************************************************************/
                                               /*BRR REGISTER CONFIGURATION*/
 #if    BUAD_RATE == SPEED_9600
@@ -23,8 +24,7 @@ void USART1_VoidInit(void) {                               /*INIT THE USART CONF
 #endif
 
 /***************************************************************************************************************************************************************************************************************************************************************/
-                                               /*CR1 REGISTER CONFIGURATION*/
-	 
+                                               /*CR1 REGISTER CONFIGURATION*/	 
 	                                                 /*TRANSMIT MODE*/
 #if    USART1_TRANS_MODE == ENABLE   
        SET_BIT(USART1->CR1,TE);	
@@ -59,8 +59,7 @@ void USART1_VoidInit(void) {                               /*INIT THE USART CONF
 #elif  PARITY_CONTROL_BIT == DISABLE
        CLEAR_BIT(USART1->CR1,TCIE);	
 #endif   
-
-                                                    /*RECEIVE DATA READY TO READ INTERRUPT */
+                                                  /*RECEIVE DATA READY TO READ INTERRUPT */
 #if    PARITY_CONTROL_BIT == ENABLE   
        SET_BIT(USART1->CR1,RXNEIE)  ;	
 #elif  PARITY_CONTROL_BIT == DISABLE
@@ -127,12 +126,12 @@ void USART1_VoidInit(void) {                               /*INIT THE USART CONF
        CLEAR_BIT(USART1->CR3,EIE);
 #elif  ERROR_INTERRUPT_ENABLE == ENABLE
        SET_BIT(USART1->CR3,EIE)  ;
-#endif  	 		
-/***********************************************************************************************************************************************************************************************************************************************************/
+#endif
 }
+/***********************************************************************************************************************************************************************************************************************************************************/
 /****************************************************  END OF FUNCTION*****************************************************************************************************************************************************/
 
-void  USART1_voidTransmit(const uint8 *Str){                         /*SENT DATA ARRAY*/
+void  USART1_voidTransmit(const uint8 *Str){                          /*SENT DATA ARRAY*/
 	
 uint8 Array_Index = 0	;
 	
@@ -140,16 +139,42 @@ uint8 Array_Index = 0	;
 	 
 	   USART1->DR = Str[Array_Index];   /*LOAD DATA IN DATA REGISTER*/ 
 	  
-		 STK_voidSetBusyWait(1000000);
+		// STK_voidSetBusyWait(100000);
+		 
 		    while(BIT_IS_CLEAR(USART1->SR,TC));   /*WAIT UNTIL TRANSMION IS COMPLETE*/
 		 
 	      Array_Index++;
 	 }
+	 
 }
+/***********************************************************************************************************************************************************************************************************************************************************/
+/****************************************************  END OF FUNCTION*****************************************************************************************************************************************************/
+
 uint8 USART1_uint8Receive(void){                                 /*RECEIVE DATA ARRAY*/
 	
 	 		 while(BIT_IS_CLEAR(USART1->SR,RXNE));   /*WAIT UNTIL DATA RECEIVED*/
         
 	      return ((0XFF)&(USART1->DR));   /*GET RECEIVED DATA*/
+	
+}
+
+/****************************************************  END OF FUNCTION*****************************************************************************************************************************************************/
+void  USART1_VoidReceive( uint8 *Str)     /*receive array of Data*/
+{
+
+ uint8 Array_Index = 0	;
+	
+ Str[Array_Index] = USART1_uint8Receive();  /*GET RECEIVED DATA*/
+	
+     while(Str[Array_Index] != '#')
+	{
+
+    Array_Index++;
+		
+		Str[Array_Index] = USART1_uint8Receive();
+ 
+	}
+	
+	Str[Array_Index] = '\0';
 	
 }

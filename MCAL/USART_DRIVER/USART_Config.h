@@ -12,9 +12,9 @@
 																							
 																			 /*  THIS CALCULATION ARE MADE FOR 8MHZ
 																			 
-																			 BRR Register Value :"SPEED_9600,SPEED_9600,SPEED_9600" 
+																			 BRR Register Value :"SPEED_9600,SPEED_4800,SPEED_9600" 
 																			                                                          */
-#define   BUAD_RATE               SPEED_9600              																																			
+#define   BUAD_RATE               SPEED_4800              																																			
 																							
 												
 /***********************************************************************************************************************************************************************************************************************************************************/
@@ -28,7 +28,7 @@
 
 #define    USART1_TRANS_MODE                ENABLE                /*CHOOSE ENABLE  TO TURN USART AS TRANSMITTER*/
 
-#define    USART1_RECEIV_MODE               DISABLE                 /*CHOOSE ENABLE  TO TURN USART AS RECEIVER */
+#define    USART1_RECEIV_MODE               ENABLE                 /*CHOOSE ENABLE  TO TURN USART AS RECEIVER */
 
 #define    TRANS_INTERRUPT_ENABLE           DISABLE                   /*TRANSMISSION COMPLETE INTERRRUPT*/
 
@@ -55,7 +55,7 @@
 
 #define       DMA_TRANSMIT_ENABLE                DISABLE                  /*DIRECT TRANSMIT TO MEMORY ENABLE OR DISABLE"*/
 
-#define       ERROR_INTERRUPT_ENABLE            DISABLE                       /*INTERRUPT ENABLE ENABLE OR DISABLE*/
+#define       ERROR_INTERRUPT_ENABLE             DISABLE                       /*INTERRUPT ENABLE ENABLE OR DISABLE*/
 
 
 
