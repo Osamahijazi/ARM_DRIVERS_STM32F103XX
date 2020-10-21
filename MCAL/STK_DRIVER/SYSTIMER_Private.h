@@ -7,40 +7,36 @@
 #ifndef SYSTIMER_PRIVATE_H
 #define SYSTIMER_PRIVATE_H
 
+#include "STD_TYPES.h"
+/***********************************************************************************************************************************************************************************************************************************************************
+                                                   *******STK REGISTERS DEFINIION**********
+***********************************************************************************************************************************************************************************************************************************************************/																																										 
 
- #include "STD_TYPES.h"
-
-   
-typedef struct{   
-
-          uint32 CTRL;
-	        uint32 LOAD;
-	        uint32 Value;
-	
+ 
+typedef struct{    
+          uint32 CTRL ;        /*The SysTick CTRL register enables the SysTick features.*/
+	        uint32 LOAD ;        /*The LOAD register specifies the start value to load into the VAL register*/
+	        uint32 Value;	       /*The VAL register contains the current value of the SysTick counter*/
+	        uint32 CALIB;        /*The CALIB register indicates the SysTick calibration properties.*/
 }STK_t;
 
-  /* Pionter to Structure */
-#define    STK    ((volatile STK_t*) 0xE000E010)
+#define  STK    ((volatile STK_t*) 0xE000E010) /*CREATE PIONTER TO STRUCTURE OF REGISTER INCREMENTED BY 4BYTE*/
+/***********************************************************************************************************************************************************************************************************************************************************
+                                                   *******Private Macros**********
+******************************************************* ****************************************************************************************************************************************************************************************************/																																										 
+	                                                       /*CTRL REGISTER MACROS*/
+#define   STK_EN                       0
+#define   STK_INT_EN                   1
+#define   STK_CLK                      2
+#define   COUNT_FLAG                   16
 
-	
-
-
-
-
-#define     STK_ENABLE                  0
-#define     STK_INTERRUPT_ENABLE        1
-#define     STK_CLOCK                   2
-#define     OVER_FLOW_FLAG             16
-
-                                                     /* only for check*/
-
-#define     STK_AHB                     0  
-#define     STK_AHB_DIV_8               1
-
-#define     STK_SINGLE_INTERVAL         0
-#define     STK_PERIOD_INTERVAL         1 
-
-
+                                                         /* CHECK MACROS*/
+#define   STK_AHB                      0  
+#define   STK_AHB_DIV_BY_8             1  
+#define   STK_SINGLE_INTERVAL          0
+#define   STK_PERIOD_INTERVAL          1 
+#define   WAIT_COUNT_FINISH         GET_BIT(STK->CTRL ,COUNT_FLAG) == 0 
 
 
 #endif
+/**************************************************************END OF FILE*********************************************************************************************************************************************************************/
