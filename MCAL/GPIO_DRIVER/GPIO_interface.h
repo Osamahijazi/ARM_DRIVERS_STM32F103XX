@@ -9,12 +9,21 @@
 #define GPIO_INTERFACE_H
 
 #include"STD_TYPES.h"
-                                 /*Registers Macros*/
-#define  GPIOA      0
-#define  GPIOB      1
-#define  GPIOC      2
+/***********************************************************************************************************************************************************************************************************************************************************
+                                                  *******Ports Macros******
+***********************************************************************************************************************************************************************************************************************************************************/																			
+#define GPIOA        0
+#define GPIOB        1
+#define GPIOC        2
+#define GPIO_HIGH    1          /*HIGH*/
+#define GPIO_LOW     0          /*LOW*/
+#define GPIOA_HIGH  0XFFFF      /*ALL PINS ARE HIGH*/
+#define GPIOB_HIGH  0XFFFF      /*ALL PINS ARE HIGH*/
+#define GPIOC_HIGH  0XE000      /*ALL PINS ARE HIGH*/
 
-                                    /*Pins Macros*/
+/***********************************************************************************************************************************************************************************************************************************************************
+                                                   *******Pins Macros**********
+***********************************************************************************************************************************************************************************************************************************************************/																																										 
 #define PIN0        0
 #define PIN1        1
 #define PIN2        2
@@ -31,20 +40,18 @@
 #define PIN13       13 
 #define PIN14       14
 #define PIN15       15
-                                       /*PINS MODES*/
-
-/*         CONFIGURATIONS_MODES        VALUE      */
-
-
-
-                    /*INPUT MODES*/
-										
+/***********************************************************************************************************************************************************************************************************************************************************
+                                                   *******Mode Configuration**********
+***********************************************************************************************************************************************************************************************************************************************************/																																										 
+/*                                                         
+               INPUT MODE               REG_VLAUE
+*/							 
 #define        INPUT_ANALOG              0b0000
 #define        INPUT_FLOATING            0b0100
 #define        INPUT_PULL_UP_DOWN        0b1000
-
-                    /*OUTPUT MODES*/
-										
+/*                                                         
+               OUTPUT MODE              REG_VLAUE
+*/
 #define       OUTPUT_10MHZ_PP             0b0001
 #define       OUTPUT_10MHZ_OD             0b0101
 #define       OUTPUT_10MHZ_AFPP           0b1001
@@ -59,43 +66,103 @@
 #define       OUTPUT_50MHZ_OD             0b0111
 #define       OUTPUT_50MHZ_AFPP           0b1011
 #define       OUTPUT_50MHZ_AFOD           0b0111
-
-                            /*OUTPUT VALUES */
-
-#define  GPIO_HIGH    1
-#define  GPIO_LOW     0
-                           /*Macros used for functions*/
-													 
-# define  VoidSetPinDirection_Bits_Masking     	0X00000001							 
-# define Bits_Shifting_number                     4
-# define  Max_Reg_Bits                            15										 
-
-
-
-
-
-                                      /*Functions*/
-
- 
- void GPIO_VoidSetPinDirection(uint8 Copy_u8Port,uint8 Copy_u8Pin,uint8 Copy_u8Mode);
- 
- void GPIO_VoidSetPinValue(uint8 Copy_u8Port,uint8 Copy_u8Pin,uint8 Copy_u8Value);
-
- uint8 GPIO_VoidGetPinValue(uint8 Copy_u8Port,uint8 Copy_u8Pin);
-
-
-void GPIO_Void_Increment_value(uint8 Copy_u8Port);
-void GPIO_Void_Decrement_value(uint8 Copy_u8Port);
-void _delay_ms (uint16 counter);
-
-
-
-
-
-
-
-
-
-
-
+/***********************************************************************************************************************************************************************************************************************************************************
+                                                   *******ERROR Macros**********
+													  EACH VALUE REPRESENT ERROR TYPE WHICH INDICATE REASON AND LOCATION OF ITS ERROR
+***********************************************************************************************************************************************************************************************************************************************************/																																										 
+#define  WRONG_PORT_NUMBER_SET_MODE         1  
+#define  WRONG_PORT_NUMBER_SET_PIN          2
+#define  WRONG_PORT_NUMBER_SET_PORT         3
+#define  WRONG_PORT_NUMBER_GET_PIN          4
+#define  WRONG_PORT_NUMBER_GET_PORT         5
+#define  WRONG_PORT_NUMBER_TOGGLE_PIN       6
+#define  WRONG_PORT_NUMBER_LOCK_PIN     7
+/***********************************************************************************************************************************************************************************************************************************************************
+                                                *******ERROR CHECK VARIABLE******
+***********************************************************************************************************************************************************************************************************************************************************/																			
+/*
+ VALUE *****   VARIABLE_NAME  **** EUNCTION_NAME** 
+  1    *****    Copy_u8Port   **** SET_PIN_DIRECTION 
+  2    *****    Copy_u8Port   **** SET_PIN_VALUE
+  3    *****    Copy_u8Port   **** SET_PORT_VALUE
+  4    *****    Copy_u8Port   **** GET_PIN_VALUE
+  5    *****    Copy_u8Port   **** GET_PORT_VALUE
+	6    *****    Copy_u8Port   **** TOOGLE_PIN_VALUE
+	7    *****    Copy_u8Port   **** LOCK_PIN_CONFIG
+*/
+/***********************************************************************************************************************************************************************************************************************************************************
+                                                *******FUNCTIONS PROTOTYPE******
+***********************************************************************************************************************************************************************************************************************************************************/																			
+/*
+  * Description:Set The mode of Certain pin
+  * Input:Port and pin number and The needed mode
+	* Output:void
+*/
+ void  GPIO_VoidSetPinDirection  (uint8  Copy_u8Port ,
+	                                uint8  Copy_u8Pin  ,
+                                  uint8  Copy_u8Mode );                                                
+/*
+  * Description:Set The Value of Certain pin
+  * Input:Port and pin number and The needed mode
+	* Output:void
+*/ 
+ void  GPIO_VoidSetPinValue      (uint8  Copy_u8Port ,
+	                                uint8  Copy_u8Pin  ,
+                                  uint8  Copy_u8Value );
+/*
+  * Description:Get The Value of Certain pin
+  * Input:Port and pin number 
+	* Output:void
+*/
+ uint8 GPIO_VoidGetPinValue      (uint8  Copy_u8Port ,
+                                  uint8  Copy_u8Pin   );
+/*
+  * Description:Toggle A certain pin
+  * Input:Port and pin number 
+	* Output:void
+*/ 
+ void  GPIO_voidTogglePinValue   (uint8  Copy_u8Port ,
+	                                uint8  Copy_u8Pin   );
+/*
+  * Description:SET Acertain Port Direction
+  * Input:Port number 
+	* Output:void
+*/ 
+ void  GPIO_voidSetPortDirection (uint8  Copy_u8Port  ,
+	                                uint8  Copy_u8Mode  );
+/*
+  * Description:SET Port value
+  * Input:Port and pin number 
+	* Output:void
+*/ 
+ void  GPIO_voidSetPortValue     (uint8  Copy_u8Port ,
+	                                uint16 Copy_uint16Value);
+/*
+  * Description:Get The Value of Certain Port
+  * Input:Port number 
+	* Output:Port value
+*/
+ uint16 GPIO_VoidGetPortValue      (uint8  Copy_u8Port  );                                  
+/*
+  * Description:Toggle A certain Port
+  * Input:Port number 
+	* Output:void
+*/ 
+ void  GPIO_voidTogglePortValue   (uint8  Copy_u8Port  );	                              
+/*
+  * Description:lock the configuration of the port bits
+  * Input:Port and pin number 
+	* Output:void
+*/ 
+ void  GPIO_voidLockPinConfig    (uint8 Copy_u8Port  ,
+	                                uint8 Copy_u8Pin    );
+ /*
+  * Description:lock the configuration of the all port 
+  * Input:Port number 
+	* Output:void
+*/ 
+ void  GPIO_voidLockPortConfig    (uint8 Copy_u8Port  );
+	                                 
 #endif
+ /**************************************************************END OF FILE*********************************************************************************************************************************************************************/
+
