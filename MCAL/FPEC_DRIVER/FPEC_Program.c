@@ -23,18 +23,18 @@ uint8 FPEC_u8WriteHalfWord( uint32 Copy_uint32Address,                  /*WRITE 
  
            			/*TO UNLOCK FLASH BLOCK , WE MUST APPLY THIS SEQUENCE TO FLASH_KEYR REGISTER*/
 		
-		    FPEC->FLASH_KEYR = FPEC_KEY1 ;     /*WRITE KEY 1 TO REGISTER*/
-		    FPEC->FLASH_KEYR = FPEC_KEY2 ;     /*WRITE KEY 2 TO REGISTER*/
+		    FPEC->KEYR = FPEC_KEY1 ;     /*WRITE KEY 1 TO REGISTER*/
+		    FPEC->KEYR = FPEC_KEY2 ;     /*WRITE KEY 2 TO REGISTER*/
 	}											
 															
-      	SET_BIT((FPEC->FLASH_CR ),PG );			        /*NOW ENABLE FLASH BLOCK TO PROGRAM*/
+      	SET_BIT((FPEC->CR ),PG );			        /*NOW ENABLE FLASH BLOCK TO PROGRAM*/
 															
 	     (*(uint16*)Copy_uint32Address) = Copy_uint16Data ;   /*LOW 16 BITS OF Copy_uint32Address LOADED BY Copy_u16Data */
 	
       	while (WAIT_FLASH);   /*WAIT TILL OPERATION IS FINISHED*/
 												
-       SET_BIT  (FPEC->FLASH_SR,OP_END);           /*RESET END OF OPERATION BIT BY WRITING ONE*/	
-       CLEAR_BIT((FPEC->FLASH_CR ), PER );        /* CLEAR ERASE BIT TO DISABLE IT*/	                                  
+       SET_BIT  (FPEC->SR,OP_END);           /*RESET END OF OPERATION BIT BY WRITING ONE*/	
+       CLEAR_BIT(FPEC->CR , PER );        /* CLEAR ERASE BIT TO DISABLE IT*/	                                  
 
 	if ( (*(uint16*)Copy_uint32Address) == Copy_uint16Data ){      /*COMPARE BETWEEN THE DATA IN ADDRESS AND INPUT DATA OF FUNCTION*/
 		
@@ -58,20 +58,20 @@ void FPEC_voidErasePage( uint8 Copy_uint8PageNumber ){    /*ERASE A CERTAIN PAGE
 
       			/*TO UNLOCK FLASH BLOCK , WE MUST APPLY THIS SEQUENCE TO FLASH_KEYR REGISTER*/
 		
-		    FPEC->FLASH_KEYR = FPEC_KEY1 ;     /*WRITE KEY 1 TO REGISTER*/
-		    FPEC->FLASH_KEYR = FPEC_KEY2 ;     /*WRITE KEY 2 TO REGISTER*/
+		    FPEC->KEYR = FPEC_KEY1 ;     /*WRITE KEY 1 TO REGISTER*/
+		    FPEC->KEYR = FPEC_KEY2 ;     /*WRITE KEY 2 TO REGISTER*/
 	}			
 	
-	     SET_BIT((FPEC->FLASH_CR),PER );    /*ENABLE ERASE OPERATION */
+	     SET_BIT((FPEC->CR),PER );    /*ENABLE ERASE OPERATION */
 	
-    	 FPEC->FLASH_AR = (uint32)(Copy_uint8PageNumber * PAGE_SIZE) + FIRST_PAGE_BASE ;/*LOAD AR REGISTER BY INPUT PAGE ADDRESS */
+    	 FPEC->AR = (uint32)(Copy_uint8PageNumber * PAGE_SIZE) + FIRST_PAGE_BASE ;/*LOAD AR REGISTER BY INPUT PAGE ADDRESS */
 	
-	     SET_BIT ((FPEC->FLASH_CR),STRT );          /*START OPERATION*/
+	     SET_BIT ((FPEC->CR),STRT );          /*START OPERATION*/
 
     	while (WAIT_FLASH);   /*WAIT TILL OPERATION IS FINISHED*/
  	
-      SET_BIT  (FPEC->FLASH_SR,OP_END);           /*RESET END OF OPERATION BIT BY WRITING ONE*/
-     	CLEAR_BIT((FPEC->FLASH_CR ), PER );        /* CLEAR ERASE BIT TO DISABLE IT*/
+      SET_BIT  (FPEC->SR,OP_END);           /*RESET END OF OPERATION BIT BY WRITING ONE*/
+     	CLEAR_BIT((FPEC->CR ), PER );        /* CLEAR ERASE BIT TO DISABLE IT*/
 	
 	/*Check the page is erased by
 reading all the addresses in
@@ -87,13 +87,13 @@ void FPEC_voidMassErase(void){           /*ERASE ALL USER PAGES IN FLAG MEMORY*/
 
       	  		/*TO UNLOCK FLASH BLOCK , WE MUST APPLY THIS SEQUENCE TO FLASH_KEYR REGISTER*/
 				
-		    FPEC->FLASH_KEYR = FPEC_KEY1 ;     /*WRITE KEY 1 TO REGISTER*/
-		    FPEC->FLASH_KEYR = FPEC_KEY2 ;     /*WRITE KEY 2 TO REGISTER*/
+		    FPEC->KEYR = FPEC_KEY1 ;     /*WRITE KEY 1 TO REGISTER*/
+		    FPEC->KEYR = FPEC_KEY2 ;     /*WRITE KEY 2 TO REGISTER*/
 	}			
 	
-  	SET_BIT((FPEC->FLASH_CR),MER);        /*ENABLE ERASE PAGE BIT */
+  	SET_BIT((FPEC->CR),MER);        /*ENABLE ERASE PAGE BIT */
 	
-  	SET_BIT((FPEC-> FLASH_CR),STRT);      /*SET BIT TO START ERASE OPERATION*/
+  	SET_BIT((FPEC->CR),STRT);      /*SET BIT TO START ERASE OPERATION*/
 
    	while (WAIT_FLASH);   /*WAIT TILL OPERATION IS FINISHED*/
 	
@@ -130,14 +130,14 @@ void FPEC_voidFlashWrite(uint32  Copy_u32Address,
   {
       	  		/*TO UNLOCK FLASH BLOCK , WE MUST APPLY THIS SEQUENCE TO FLASH_KEYR REGISTER*/
 				
-		    FPEC->FLASH_KEYR = FPEC_KEY1 ;     /*WRITE KEY 1 TO REGISTER*/
-		    FPEC->FLASH_KEYR = FPEC_KEY2 ;     /*WRITE KEY 2 TO REGISTER*/
+		    FPEC->KEYR = FPEC_KEY1 ;     /*WRITE KEY 1 TO REGISTER*/
+		    FPEC->KEYR = FPEC_KEY2 ;     /*WRITE KEY 2 TO REGISTER*/
 	}													 
 
 	for (Data_Counter = 0; Data_Counter< Copy_u8Length; Data_Counter++)
 	{
 		
-		SET_BIT((FPEC->FLASH_CR ),PG );			        /*NOW ENABLE FLASH BLOCK TO PROGRAM*/
+		SET_BIT((FPEC->CR ),PG );			        /*NOW ENABLE FLASH BLOCK TO PROGRAM*/
 
 
 		//Temp = Copy_u16Data[i];
@@ -148,8 +148,8 @@ void FPEC_voidFlashWrite(uint32  Copy_u32Address,
 
 		while (WAIT_FLASH);   /*WAIT TILL OPERATION IS FINISHED*/
  	
-     SET_BIT  (FPEC->FLASH_SR,OP_END);           /*RESET END OF OPERATION BIT BY WRITING ONE*/
-    	CLEAR_BIT((FPEC->FLASH_CR ), PER );        /* CLEAR ERASE BIT TO DISABLE IT*/
+        SET_BIT  (FPEC->SR,OP_END);           /*RESET END OF OPERATION BIT BY WRITING ONE*/
+    	CLEAR_BIT((FPEC->CR ), PER );        /* CLEAR ERASE BIT TO DISABLE IT*/
 	
 	}											 
 

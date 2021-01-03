@@ -13,15 +13,15 @@
 ***********************************************************************************************************************************************************************************************************************************************************/
 typedef struct {
 	
-	          uint32 FLASH_ACR ;
-	          uint32 FLASH_KEYR ;
-	          uint32 FLASH_OPTKEYR ;
-	          uint32 FLASH_SR ;
-	          uint32 FLASH_CR ;
-	          uint32 FLASH_AR ;
-	          uint32 RESERVED ;
-         	  uint32 FLASH_OBR ;
-	          uint32 FLASH_WRPR ;
+     volatile uint32 ACR ;
+	 volatile uint32 KEYR ;
+	 volatile uint32 OPTKEYR ;
+	 volatile uint32 SR ;
+	 volatile uint32 CR ;
+	 volatile uint32 AR ;
+	 volatile uint32 RESERVED ;
+     volatile uint32 OBR ;
+     volatile uint32 WRPR ;
 }FPEC_TYPE ;
 
 #define   FPEC   ((volatile FPEC_TYPE *)0x40022000)  /*CREATE PIONTER TO FPEC STRUCTURE INCREMENT BY 4BYTE*/
@@ -40,10 +40,12 @@ typedef struct {
 #define   PG            0                 /*Flash programming chosen*/
 #define   PER           1                 /*Page Erase chosen*/
 #define   MER           2                 /*Erase of all user pages chosen*/
+#define   RES1          3                 
 #define   OPTPG         4                 /*Option byte programming choosen*/
 #define   OPTER         5                 /*Option byte erase chosen*/
 #define   STRT          6                 /*This bit triggers an ERASE operation when set*/
 #define   LOCK          7                 /* LOCK FPEC and FLASH_CR when it is set*/
+#define   RES2          8                 
 #define   OPTWRE        9                 /*Option bytes write enable */
 #define   ERRIE         10                 /*Error interrupt enable*/
 #define   EOPIE         12                 /*End of operation interrupt enable*/
@@ -59,8 +61,8 @@ typedef struct {
 #define  WRITE_FAILED      1			
 #define  FIRST_PAGE_BASE   0x08000000
 # define PAGE_SIZE         1024
-#define  WAIT_FLASH        BIT_IS_SET(FPEC->FLASH_SR,BUS)
-#define  LOCK_IS_SET       BIT_IS_SET(FPEC->FLASH_CR,LOCK )
+#define  WAIT_FLASH        BIT_IS_SET(FPEC->SR,BUS)
+#define  LOCK_IS_SET       BIT_IS_SET(FPEC->CR,LOCK )
 																																		
 
 
