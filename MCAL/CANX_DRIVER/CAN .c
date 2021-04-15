@@ -12,6 +12,9 @@
 **                                                                            **
 **  DESCRIPTION  : CAN Driver source file                                     **
 **                                                                            **
+**  SPECIFICATION(S) : Specification of CAN Driver, AUTOSAR Release 4.3.1     **
+**                                                                            **
+**                                                                            **
 *******************************************************************************/
 /**********************************************include******************************************/
 #include "CAN.h"
@@ -19,7 +22,7 @@
 /*
 Description: CAN Rx message structure for pending interrupt
 */
-CanRxMsg       RxMessage;               // CAN messge   struct  for  receiving
+CanRxMsg*  RxMessage;               // CAN messge   struct  for  receiving
 
 /************************************************Functions Definition*******************************/
 void CAN_VoidInit(CAN_TypeDef* CANx, CAN_InitTypeDef* CANInitStruct)
@@ -236,7 +239,7 @@ void CAN_VoidFilterSet(CAN_FilterInitTypeDef* CAN_FilterInitStruct)
 
 }
 /************************************************END OF FUNCTION*******************************/
- u8 CAN_VoidTransmit(CAN_TypeDef* CANx, CanTxMsg  TxMessage)
+ u8 CAN_VoidTransmit(CAN_TypeDef* CANx, CanTxMsg* TxMessage)
 {
 
 	u8 Local_u8TransMailboxNumber = 0; //contain empty mailbox number
@@ -262,39 +265,39 @@ void CAN_VoidFilterSet(CAN_FilterInitTypeDef* CAN_FilterInitStruct)
   if (Local_u8TransMailboxNumber != CAN_TxStatus_NoMailBox) //
   {
 		
-		CANx->sTxMailBox[Local_u8TransMailboxNumber].TIR |= (TxMessage.IDE << 2) | (TxMessage.RTR << 1 ) ;//setrtr and ide of input fram
+		CANx->sTxMailBox[Local_u8TransMailboxNumber].TIR |= (TxMessage->IDE << 2) | (TxMessage->RTR << 1 ) ;//setrtr and ide of input fram
 
 		 
 		CANx->sTxMailBox[Local_u8TransMailboxNumber].TIR = 0;     //reset identifier register
 		
 		//set CAN identifier		
-		if (TxMessage.IDE) //standard
+		if (TxMessage->IDE) //standard
 		{	
-			CANx->sTxMailBox[Local_u8TransMailboxNumber].TIR |= (TxMessage.ID << 3); //extended
+			CANx->sTxMailBox[Local_u8TransMailboxNumber].TIR |= (TxMessage->ID << 3); //extended
 		}
 		
 		else //extendedD
 		{	
-			CANx->sTxMailBox[Local_u8TransMailboxNumber].TIR |= (TxMessage.ID << 21); //standard
+			CANx->sTxMailBox[Local_u8TransMailboxNumber].TIR |= (TxMessage->ID << 21); //standard
 		}
 		
 		CANx->sTxMailBox[Local_u8TransMailboxNumber].TDTR = (CANx->sTxMailBox[Local_u8TransMailboxNumber].TDTR & (~0x0f))		//set data length
-				                                               | TxMessage.DATA_LENGHT ;
+				                                               | TxMessage->DATA_LENGHT ;
 		
 		/*reset transmit data registers*/
 		CANx->sTxMailBox[Local_u8TransMailboxNumber].TDLR = 0;
 		CANx->sTxMailBox[Local_u8TransMailboxNumber].TDHR = 0;
 		
-		for ( Local_u8TransDataCounter = 0; Local_u8TransDataCounter < TxMessage.DATA_LENGHT; Local_u8TransDataCounter++)
+		for ( Local_u8TransDataCounter = 0; Local_u8TransDataCounter < TxMessage->DATA_LENGHT; Local_u8TransDataCounter++)
 		{
 			
 			if (Local_u8TransDataCounter < 4)           //set LSB (16 bits) of the Data 
 			{
-				CANx->sTxMailBox[Local_u8TransMailboxNumber].TDLR |= (TxMessage.DATAPTR[Local_u8TransDataCounter] << (8 * Local_u8TransDataCounter)); // masking word byte by byte to low register
+				CANx->sTxMailBox[Local_u8TransMailboxNumber].TDLR |= (TxMessage->DATA[Local_u8TransDataCounter] << (8 * Local_u8TransDataCounter)); // masking word byte by byte to low register
 			}
 			else /*(Local_u8DataCounter >= 4) */  //set MSB (16 bits) of the Data
 			{
-				CANx->sTxMailBox[Local_u8TransMailboxNumber].TDHR |= (TxMessage.DATAPTR[Local_u8TransDataCounter] << (8 * (Local_u8TransDataCounter - 4)));// masking word byte by byte to high register
+				CANx->sTxMailBox[Local_u8TransMailboxNumber].TDHR |= (TxMessage->DATA[Local_u8TransDataCounter] << (8 * (Local_u8TransDataCounter - 4)));// masking word byte by byte to high register
 			}
 			
 		}
@@ -320,13 +323,13 @@ void CAN_VoidReceive(CAN_TypeDef* CANx, u8 Copy_u8FifoNumber, CanRxMsg* RxMessag
 			
     RxMessage->FMI =  ((CANx->sFIFOMailBox[Copy_u8FifoNumber].RDTR >> 8) & (u8)0xFF) ;	// Get the FMI 
 			
-		if (RxMessage->IDE) //standard
+		if ( RxMessage->IDE == 0X00 ) //standard
 		{
-			RxMessage->ID = ( CANx->sFIFOMailBox[Copy_u8FifoNumber].RIR >> 21) & (u32)0x000007FF ; //get 11 bit of standard id
+			RxMessage->ID = ( CANx->sFIFOMailBox[Copy_u8FifoNumber].RIR >> 21) & ((u32)0x000007FF) ; //get 11 bit of standard id
 		}			
 		else//extended
 		{
-			RxMessage->ID = ( CANx->sFIFOMailBox[Copy_u8FifoNumber].RIR >> 3 ) & (u32)0x1FFFFFFF ; // get 29 bit of extended message
+			RxMessage->ID = ( CANx->sFIFOMailBox[Copy_u8FifoNumber].RIR >> 3 ) & ((u32)0x1FFFFFFF) ; // get 29 bit of extended message
 		}	
 		
 		for ( Local_u8ReceivDataCounter = 0;  Local_u8ReceivDataCounter< RxMessage->DATA_LENGHT; Local_u8ReceivDataCounter++)
@@ -334,11 +337,11 @@ void CAN_VoidReceive(CAN_TypeDef* CANx, u8 Copy_u8FifoNumber, CanRxMsg* RxMessag
 		{
 			if (Local_u8ReceivDataCounter < 4)  //get LSB (16 bits) of the Data 
 			{
-				RxMessage->DATAPTR[Local_u8ReceivDataCounter] = (CANx->sFIFOMailBox[Copy_u8FifoNumber].RDLR >> (Local_u8ReceivDataCounter* 8))  & 0xFF; //get Data from low register byte by byte
+				RxMessage->DATA[Local_u8ReceivDataCounter] = (CANx->sFIFOMailBox[Copy_u8FifoNumber].RDLR >> (Local_u8ReceivDataCounter* 8))  & 0xFF; //get Data from low register byte by byte
 			}
 			else /*(Local_u8ReceivDataCounter >= 4)*/  //Get LSB (16 bits) of the Data 
 			{	
-				RxMessage->DATAPTR[Local_u8ReceivDataCounter] = (CANx->sFIFOMailBox[Copy_u8FifoNumber].RDHR >> ((Local_u8ReceivDataCounter - 4) * 8)) & 0xFF; //get Data from high register byte by byte
+				RxMessage->DATA[Local_u8ReceivDataCounter] = (CANx->sFIFOMailBox[Copy_u8FifoNumber].RDHR >> ((Local_u8ReceivDataCounter - 4) * 8)) & 0xFF; //get Data from high register byte by byte
 			}	
 						
 		}
@@ -433,10 +436,10 @@ void CAN_VoidTimeTriggerCommMode(CAN_TypeDef* CANx, FunctionalState NewState , u
 }
 
 /************************************************END OF FUNCTION*******************************/
-void USB_HP_CAN_TX_IRQHandler (void)
+void USB_HP_CAN1_TX0_IRQHandler (void)
 	{
                                   /*Check For Request completed mailbox */
-		
+				
   if (CAN1->TSR & CAN_TSR_RQCP0)   // request completed mbx 0
 		{                
   
@@ -469,7 +472,11 @@ else
 	
 }
 /************************************************END OF FUNCTION*******************************/
-void USB_LP_CAN_RX0_IRQHandler (void) {
+void USB_LP_CAN1_RX0_IRQHandler (void) {
+
+	
+		GPIO_VoidSetPinValue( GPIOA , 2 , 1); // TEST
+	
 
   if (CAN1->RF0R & CAN_RF0R_FMP0)  // CHECK IF fifo 0 is not empty
 		

@@ -12,7 +12,8 @@
 **  VENDOR       : osamaheijazi	                                              **
 **                                                                            **
 **                                                                            **
-**  DESCRIPTION  : CAN Driver header file                                     **
+**  DESCRIPTION  : CAN Driver source file                                     **
+**                                                                            **
 *******************************************************************************/
 
 
@@ -210,11 +211,11 @@ typedef struct {
 	
 	u32 ID;  // message identifier
 	
-	u8 DATA_LENGHT;  //number of data bytes "0 - 8" and must be 8 incase of time trigger
+	u8 DATA_LENGHT;  //number of data bytes "0 - 8"
 	
-	u8 *DATAPTR;  // pointer to the data address
+	u8 DATA[8];  // pointer to the data 
 	
-}CanTxMsg  ;
+}CanTxMsg ;
 
 /*
 Description: CAN Rx message structure definition
@@ -227,13 +228,13 @@ typedef struct {
 	
 	u32 ID;  // message identifier
 	
-	u8 DATA_LENGHT;  //number of data bytes "0 - 8"  and must be 8 incase of time trigger
+	u8 DATA_LENGHT;  //number of data bytes "0 - 8"
 	
-	u8 *DATAPTR;  // pointer to the data address 
+	u8 DATA[8];  // pointer to the data 
 	
 	u8 FMI;      // contain the index of the filter the message was stored in 
                        
-}CanRxMsg  ;
+}CanRxMsg ;
 /***********************************************************************************/
                       /***FUNCTIONS PROTOTYPES***/
 /***********************************************************************************
@@ -247,7 +248,8 @@ typedef struct {
 							
 *pos-Cond   : None
 
-*Input      : canx struct "x=1,2,..."  ,CAN InitStruct to specifiy the configuration
+*Input      : canx struct "x=1,2,..."  according to how many can in controller
+              CAN InitStruct to specifiy the configuration
 
 *Output     : void
 
@@ -260,7 +262,7 @@ void CAN_VoidInit(CAN_TypeDef* CANx, CAN_InitTypeDef* CANInitStruct);
 *Name       :   CAN_VoidFilterSet
 
 *Description: * Initializes specific filtr bank with   
-			  configuration in filter init struct
+							  configuration in filter init struct
 								
 *Pre-Cond   :	None				
 							
@@ -285,8 +287,9 @@ void CAN_VoidFilterSet(CAN_FilterInitTypeDef* CAN_FilterInitStruct);
 							
 *pos-Cond   : None
 
-*Input      : -canx struct "x=1,2,...",CAN InitStruct to specifiy the configuration
-			 - fifo number we want to receive the message located on it
+*Input      : -canx struct "x=1,2,..."  according to how many can in controller
+              CAN InitStruct to specifiy the configuration
+						 - fifo number we want to receive the message located on it
              - message fram struct address that will contain reveived message						 
 
 *Output     : void
@@ -306,7 +309,8 @@ void CAN_VoidReceive(CAN_TypeDef* CANx, u8 Copy_u8FifoNumber, CanRxMsg* RxMessag
 							
 *pos-Cond   : None
 
-*Input      : -canx struct "x=1,2,..."  ,CAN InitStruct to specifiy the configuration
+*Input      : -canx struct "x=1,2,..."  according to how many can in controller
+              CAN InitStruct to specifiy the configuration
              - message fram struct address that will contain transmit message						 
 
 *Output     : void
@@ -314,7 +318,7 @@ void CAN_VoidReceive(CAN_TypeDef* CANx, u8 Copy_u8FifoNumber, CanRxMsg* RxMessag
 *Return     : void
 
 *************************************************************************************/
-u8 CAN_VoidTransmit(CAN_TypeDef* CANx, CanTxMsg  TxMessage);
+u8 CAN_VoidTransmit(CAN_TypeDef* CANx, CanTxMsg*  TxMessage);
 /************************************************************************************
 
 *Name       :   CAN_u8GetLastErrorCodeType
@@ -326,8 +330,9 @@ u8 CAN_VoidTransmit(CAN_TypeDef* CANx, CanTxMsg  TxMessage);
 							
 *pos-Cond   : None
 
-*Input      : -canx struct "x=1,2,..." CAN InitStruct to specifiy the configuration
-              						 
+*Input      : -canx struct "x=1,2,..."  according to how many can in controller
+              CAN InitStruct to specifiy the configuration
+             - 						 
 
 *Output     : error code Type , the Error should be one of the following
               No Error  
@@ -339,7 +344,7 @@ u8 CAN_VoidTransmit(CAN_TypeDef* CANx, CanTxMsg  TxMessage);
 							CRC Error
 							Software Set Error  
 
-*Return     : last Error code 
+*Return     : void
 *************************************************************************************/
 u8 CAN_u8GetLastErrorCodeType(CAN_TypeDef* CANx);
 /************************************************************************************
@@ -348,13 +353,13 @@ u8 CAN_u8GetLastErrorCodeType(CAN_TypeDef* CANx);
 
 *Description: * Enables or disables the specified CANx interrupts.   
 							
-*Pre-Cond   : None				
+*Pre-Cond   :	None				
 							
 *pos-Cond   : None
 
 *Input      : -canx struct "x=1,2,..."  according to how many can in controller
               CAN InitStruct to specifiy the configuration
-			- type of interrupt you want to enable or disable,it should be on of the following :
+							- type of interrupt you want to enable or disable,it should be on of the following :
 							CAN_IER_TMEIE 
 							CAN_FMPIE0
 							CAN_FFIE0 
@@ -371,12 +376,12 @@ u8 CAN_u8GetLastErrorCodeType(CAN_TypeDef* CANx);
 							CAN_SLKIE 
 *Output     : void
 
-*Return     : void
+*Return     : last Error code type
 ****************************************************************************************/
 void CAN_VoidInterruptSet(CAN_TypeDef* CANx, u32 Copy_u32CanInterruptType, FunctionalState Copy_u8InterruptNewState);
 /************************************************************************************
 
-*Name       :   CAN_VoidTimeTriggerCommMode
+*Name       :   CAN_VoidTransmit
 
 *Description: * activate or deactivate time trigger communication mode of a specific mailbox 
 
@@ -386,9 +391,10 @@ void CAN_VoidInterruptSet(CAN_TypeDef* CANx, u32 Copy_u32CanInterruptType, Funct
 							
 *pos-Cond   : None
 
-*Input      : -canx struct "x=1,2 " ,CAN Init Struct to specifiy the configuration
+*Input      : -canx struct "x=1,2,..."  according to how many can in controller
+              CAN InitStruct to specifiy the configuration
              -new state of the mode
-             -number of the mail box to config it 						 
+             -number of the mail box to activate						 
 
 *Output     : void
 
